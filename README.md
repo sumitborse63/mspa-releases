@@ -1,4 +1,4 @@
-# mspa-releases
+# schedulify
 
 This repository now includes a working Android project scaffold for the **AI Schedule Generator** app, aligned with the implementation blueprint.
 

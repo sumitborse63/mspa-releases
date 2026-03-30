@@ -14,6 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "mspa-releases"
+rootProject.name = "schedulify"
 include(":app")
 include(":core:scheduler")

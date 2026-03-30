@@ -3,9 +3,9 @@
 
     <application
         android:allowBackup="true"
-        android:label="MSPA Scheduler"
+        android:label="Schedulify"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Mspa">
+        android:theme="@style/Theme.Schedulify">
         <activity
             android:name=".MainActivity"
             android:exported="true">

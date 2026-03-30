@@ -1,11 +1,11 @@
-package com.mspa.app.scheduling
+package sktech.schedulify.scheduling
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.mspa.app.data.InMemoryTaskRepository
-import com.mspa.app.domain.parsePrompt
+import sktech.schedulify.data.InMemoryTaskRepository
+import sktech.schedulify.domain.parsePrompt
 import com.mspa.scheduler.DayScheduler
 import com.mspa.scheduler.ScheduleTask
 import java.time.LocalDateTime

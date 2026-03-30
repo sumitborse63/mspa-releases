@@ -1,4 +1,4 @@
-package com.mspa.app.ui
+package sktech.schedulify.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.mspa.app.scheduling.ScheduleViewModel
+import sktech.schedulify.scheduling.ScheduleViewModel
 import com.mspa.scheduler.ScheduledBlock
 import java.time.format.DateTimeFormatter
 

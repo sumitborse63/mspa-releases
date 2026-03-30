@@ -2,11 +2,21 @@ package sktech.schedulify.domain
 
 import java.time.DayOfWeek
 import java.time.LocalDate
+import sktech.schedulify.scheduler.RecurrencePattern
+import sktech.schedulify.scheduler.TaskCategory
 
 private val DURATION_REGEX = Regex("""for\s+(\d+)\s*(hours?|hrs?|minutes?|mins?)""", RegexOption.IGNORE_CASE)
 private val DEADLINE_REGEX = Regex("""before\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)""", RegexOption.IGNORE_CASE)
+private val IN_DAYS_REGEX = Regex("""in\s+(\d+)\s+days?""", RegexOption.IGNORE_CASE)
+private const val BASE_CONFIDENCE_SCORE = 0.55
+private const val DURATION_CONFIDENCE_BONUS = 0.20
+private const val DEADLINE_CONFIDENCE_BONUS = 0.15
+private const val CATEGORY_CONFIDENCE_BONUS = 0.10
+private const val AMBIGUITY_CONFIDENCE_PENALTY = 0.05
+private const val MIN_CONFIDENCE_SCORE = 0.20
+private const val MAX_CONFIDENCE_SCORE = 0.98
 
-fun parsePrompt(prompt: String): TaskDraft {
+fun parsePrompt(prompt: String): ParsedTaskIntent {
     val trimmed = prompt.trim().ifBlank { "Untitled task" }
     val durationMatch = DURATION_REGEX.find(trimmed)
     val amount = durationMatch?.groupValues?.get(1)?.toIntOrNull() ?: 1
@@ -16,20 +26,106 @@ fun parsePrompt(prompt: String): TaskDraft {
     val title = trimmed
         .replace(DURATION_REGEX, "")
         .replace(DEADLINE_REGEX, "")
+        .replace(IN_DAYS_REGEX, "")
+        .replace(Regex("""daily|every day|weekly|urgent|high priority|morning|afternoon|evening""", RegexOption.IGNORE_CASE), "")
         .replace(Regex("""\s+"""), " ")
         .trim()
         .ifBlank { "Planned task" }
 
-    val deadline = DEADLINE_REGEX.find(trimmed)?.groupValues?.get(1)?.let { weekday ->
-        nextDayOfWeek(weekday)
-    }
+    val deadline = parseDeadline(trimmed)
+    val category = inferCategory(trimmed)
+    val recurrence = inferRecurrence(trimmed)
+    val preferredStartHour = inferPreferredStartHour(trimmed)
+    val priority = inferPriority(trimmed)
+    val ambiguities = mutableListOf<String>()
+    if (!trimmed.contains(DURATION_REGEX)) ambiguities += "Duration not explicit"
+    if (deadline == null) ambiguities += "Deadline not specified"
 
-    return TaskDraft(
+    return ParsedTaskIntent(
         title = title,
         estimatedMinutes = durationMinutes.coerceAtLeast(15),
         deadline = deadline,
-        priority = if (trimmed.contains("urgent", ignoreCase = true)) 5 else 3
+        priority = priority,
+        category = category,
+        recurrence = recurrence,
+        preferredStartHour = preferredStartHour,
+        confidence = confidenceScore(trimmed, deadline, ambiguities),
+        questions = buildQuestions(ambiguities, title)
     )
+}
+
+private fun parseDeadline(prompt: String): LocalDate? {
+    DEADLINE_REGEX.find(prompt)?.groupValues?.get(1)?.let { weekday ->
+        return nextDayOfWeek(weekday)
+    }
+    IN_DAYS_REGEX.find(prompt)?.groupValues?.get(1)?.toIntOrNull()?.let { days ->
+        return LocalDate.now().plusDays(days.toLong())
+    }
+    return null
+}
+
+private fun inferCategory(prompt: String): TaskCategory {
+    val normalized = prompt.lowercase()
+    return when {
+        normalized.contains("study") || normalized.contains("exam") || normalized.contains("revision") -> TaskCategory.STUDY
+        normalized.contains("work") || normalized.contains("meeting") || normalized.contains("project") || normalized.contains("coding") -> TaskCategory.WORK
+        normalized.contains("gym") || normalized.contains("workout") || normalized.contains("run") -> TaskCategory.FITNESS
+        normalized.contains("health") || normalized.contains("meditation") || normalized.contains("walk") -> TaskCategory.HEALTH
+        normalized.contains("family") || normalized.contains("personal") || normalized.contains("home") -> TaskCategory.PERSONAL
+        else -> TaskCategory.OTHER
+    }
+}
+
+private fun inferRecurrence(prompt: String): RecurrencePattern {
+    val normalized = prompt.lowercase()
+    return when {
+        normalized.contains("daily") || normalized.contains("every day") -> RecurrencePattern.DAILY
+        normalized.contains("weekly") -> RecurrencePattern.WEEKLY
+        else -> RecurrencePattern.NONE
+    }
+}
+
+private fun inferPreferredStartHour(prompt: String): Int? {
+    val normalized = prompt.lowercase()
+    return when {
+        normalized.contains("morning") -> 7
+        normalized.contains("afternoon") -> 13
+        normalized.contains("evening") -> 18
+        else -> null
+    }
+}
+
+private fun inferPriority(prompt: String): Int {
+    val normalized = prompt.lowercase()
+    return when {
+        "urgent" in normalized || "asap" in normalized -> 5
+        "high priority" in normalized || "important" in normalized -> 4
+        else -> 3
+    }
+}
+
+private fun confidenceScore(
+    prompt: String,
+    deadline: LocalDate?,
+    ambiguities: List<String>
+): Double {
+    var score = BASE_CONFIDENCE_SCORE
+    if (DURATION_REGEX.containsMatchIn(prompt)) score += DURATION_CONFIDENCE_BONUS
+    if (deadline != null) score += DEADLINE_CONFIDENCE_BONUS
+    if (inferCategory(prompt) != TaskCategory.OTHER) score += CATEGORY_CONFIDENCE_BONUS
+    if (ambiguities.isNotEmpty()) score -= ambiguities.size * AMBIGUITY_CONFIDENCE_PENALTY
+    return score.coerceIn(MIN_CONFIDENCE_SCORE, MAX_CONFIDENCE_SCORE)
+}
+
+private fun buildQuestions(ambiguities: List<String>, title: String): List<String> {
+    val questions = mutableListOf<String>()
+    if (ambiguities.any { it.contains("Duration") }) {
+        questions += "How long should \"$title\" take?"
+    }
+    if (ambiguities.any { it.contains("Deadline") }) {
+        questions += "When is the deadline for \"$title\"?"
+    }
+    return questions
 }
 
 private fun nextDayOfWeek(weekday: String): LocalDate {
@@ -42,9 +138,14 @@ private fun nextDayOfWeek(weekday: String): LocalDate {
     return date
 }
 
-data class TaskDraft(
+data class ParsedTaskIntent(
     val title: String,
     val estimatedMinutes: Int,
     val deadline: LocalDate?,
-    val priority: Int
+    val priority: Int,
+    val category: TaskCategory,
+    val recurrence: RecurrencePattern,
+    val preferredStartHour: Int?,
+    val confidence: Double,
+    val questions: List<String>
 )

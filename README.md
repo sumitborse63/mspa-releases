@@ -1,6 +1,6 @@
 # schedulify
 
-This repository now includes a working Android project scaffold for the **AI Schedule Generator** app, aligned with the implementation blueprint.
+This repository now includes a working Android project scaffold for the **Schedulify** app, aligned with the implementation blueprint.
 
 ## Modules
 - `app` — Jetpack Compose Android app (prompt input, schedule generation, day-plan timeline)

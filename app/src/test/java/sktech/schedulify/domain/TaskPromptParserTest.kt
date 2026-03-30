@@ -1,4 +1,4 @@
-package com.mspa.app.domain
+package sktech.schedulify.domain
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

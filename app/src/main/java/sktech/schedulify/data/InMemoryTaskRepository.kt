@@ -1,6 +1,6 @@
-package com.mspa.app.data
+package sktech.schedulify.data
 
-import com.mspa.app.domain.TaskDraft
+import sktech.schedulify.domain.TaskDraft
 
 class InMemoryTaskRepository {
     private val tasks = mutableListOf<TaskDraft>()

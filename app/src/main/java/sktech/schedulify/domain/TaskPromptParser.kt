@@ -1,4 +1,4 @@
-package com.mspa.app.domain
+package sktech.schedulify.domain
 
 import java.time.DayOfWeek
 import java.time.LocalDate

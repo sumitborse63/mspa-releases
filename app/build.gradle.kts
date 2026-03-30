@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.mspa.app"
+    namespace = "sktech.schedulify"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.mspa.app"
+        applicationId = "sktech.schedulify"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

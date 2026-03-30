@@ -9,6 +9,12 @@ class DayScheduler(
     private val maxBlockMinutes: Int = 90,
     private val breakMinutes: Int = 15
 ) {
+    private companion object {
+        const val BREAK_THRESHOLD_MINUTES = 90
+        const val RESCHEDULE_BUFFER_MINUTES = 15L
+        const val CURSOR_STEP_MINUTES = 15L
+    }
+
     fun generate(
         tasks: List<ScheduleTask>,
         dayStart: LocalDateTime,
@@ -63,7 +69,7 @@ class DayScheduler(
                 val overlapsNoWork = overlapsNoWorkWindow(cursor, end, noWorkWindows)
                 if (end > dayEnd || overlapsNoWork || violatesDeadline) {
                     if (end > dayEnd) break
-                    cursor = cursor.plusMinutes(15)
+                    cursor = cursor.plusMinutes(CURSOR_STEP_MINUTES)
                     continue
                 }
 
@@ -82,7 +88,7 @@ class DayScheduler(
                 scheduledAnyChunk = true
                 focusStreakMinutes += chunk
 
-                if (focusStreakMinutes >= 90) {
+                if (focusStreakMinutes >= BREAK_THRESHOLD_MINUTES) {
                     val breakEnd = cursor.plusMinutes(breakMinutes.toLong())
                     if (breakEnd <= dayEnd && !overlapsNoWorkWindow(cursor, breakEnd, noWorkWindows)) {
                         blocks.add(
@@ -166,7 +172,7 @@ class DayScheduler(
                     suggestedStart = cursor,
                     suggestedEnd = end
                 )
-                cursor = end.plusMinutes(15)
+                cursor = end.plusMinutes(RESCHEDULE_BUFFER_MINUTES)
             }
         }
         return options

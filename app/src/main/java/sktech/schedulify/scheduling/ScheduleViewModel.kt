@@ -22,7 +22,6 @@ import sktech.schedulify.notifications.NotificationPlan
 import sktech.schedulify.notifications.NotificationScheduler
 import sktech.schedulify.scheduler.DayScheduler
 import sktech.schedulify.scheduler.MissedTask
-import sktech.schedulify.scheduler.RecurrencePattern
 import sktech.schedulify.scheduler.ScheduleTask
 import sktech.schedulify.scheduler.TimeWindowConstraint
 import sktech.schedulify.scheduler.UserPreferences
@@ -57,7 +56,8 @@ class ScheduleViewModel : ViewModel() {
                 durationMinutes = draft.estimatedMinutes,
                 deadline = draft.deadline?.atTime(23, 0),
                 priority = draft.priority,
-                category = draft.category
+                category = draft.category,
+                recurrence = draft.recurrence
             )
         )
         prompt = ""
@@ -82,7 +82,7 @@ class ScheduleViewModel : ViewModel() {
                     priority = entity.priority,
                     deadline = entity.deadline,
                     category = entity.category,
-                    recurrence = if (entity.title.contains("daily", ignoreCase = true)) RecurrencePattern.DAILY else RecurrencePattern.NONE,
+                    recurrence = entity.recurrence,
                     preferredStartHour = draft.preferredStartHour
                 )
             },
@@ -99,7 +99,8 @@ class ScheduleViewModel : ViewModel() {
                     estimatedMinutes = entity.durationMinutes,
                     priority = entity.priority,
                     deadline = entity.deadline,
-                    category = entity.category
+                    category = entity.category,
+                    recurrence = entity.recurrence
                 )
             },
             weekStart = now,

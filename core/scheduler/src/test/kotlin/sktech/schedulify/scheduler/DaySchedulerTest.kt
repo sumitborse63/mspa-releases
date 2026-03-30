@@ -69,6 +69,14 @@ class DaySchedulerTest {
             noWorkWindows = listOf(TimeWindowConstraint(LocalTime.of(8, 0), LocalTime.of(9, 0)))
         )
 
-        assertTrue(result.blocks.none { it.start.toLocalTime() < LocalTime.of(9, 0) && it.end.toLocalTime() > LocalTime.of(8, 0) })
+        assertTrue(result.blocks.none { overlapsWindow(it, LocalTime.of(8, 0), LocalTime.of(9, 0)) })
+    }
+
+    private fun overlapsWindow(
+        block: ScheduledBlock,
+        windowStart: LocalTime,
+        windowEnd: LocalTime
+    ): Boolean {
+        return block.start.toLocalTime() < windowEnd && block.end.toLocalTime() > windowStart
     }
 }

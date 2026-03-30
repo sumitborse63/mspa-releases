@@ -8,6 +8,13 @@ import sktech.schedulify.scheduler.TaskCategory
 private val DURATION_REGEX = Regex("""for\s+(\d+)\s*(hours?|hrs?|minutes?|mins?)""", RegexOption.IGNORE_CASE)
 private val DEADLINE_REGEX = Regex("""before\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday)""", RegexOption.IGNORE_CASE)
 private val IN_DAYS_REGEX = Regex("""in\s+(\d+)\s+days?""", RegexOption.IGNORE_CASE)
+private const val BASE_CONFIDENCE_SCORE = 0.55
+private const val DURATION_CONFIDENCE_BONUS = 0.20
+private const val DEADLINE_CONFIDENCE_BONUS = 0.15
+private const val CATEGORY_CONFIDENCE_BONUS = 0.10
+private const val AMBIGUITY_CONFIDENCE_PENALTY = 0.05
+private const val MIN_CONFIDENCE_SCORE = 0.20
+private const val MAX_CONFIDENCE_SCORE = 0.98
 
 fun parsePrompt(prompt: String): ParsedTaskIntent {
     val trimmed = prompt.trim().ifBlank { "Untitled task" }
@@ -102,12 +109,12 @@ private fun confidenceScore(
     deadline: LocalDate?,
     ambiguities: List<String>
 ): Double {
-    var score = 0.55
-    if (DURATION_REGEX.containsMatchIn(prompt)) score += 0.2
-    if (deadline != null) score += 0.15
-    if (inferCategory(prompt) != TaskCategory.OTHER) score += 0.1
-    if (ambiguities.isNotEmpty()) score -= ambiguities.size * 0.05
-    return score.coerceIn(0.2, 0.98)
+    var score = BASE_CONFIDENCE_SCORE
+    if (DURATION_REGEX.containsMatchIn(prompt)) score += DURATION_CONFIDENCE_BONUS
+    if (deadline != null) score += DEADLINE_CONFIDENCE_BONUS
+    if (inferCategory(prompt) != TaskCategory.OTHER) score += CATEGORY_CONFIDENCE_BONUS
+    if (ambiguities.isNotEmpty()) score -= ambiguities.size * AMBIGUITY_CONFIDENCE_PENALTY
+    return score.coerceIn(MIN_CONFIDENCE_SCORE, MAX_CONFIDENCE_SCORE)
 }
 
 private fun buildQuestions(ambiguities: List<String>, title: String): List<String> {

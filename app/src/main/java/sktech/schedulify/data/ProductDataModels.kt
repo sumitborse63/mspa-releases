@@ -23,7 +23,8 @@ data class TaskEntity(
     val durationMinutes: Int,
     val deadline: LocalDateTime?,
     val priority: Int,
-    val category: TaskCategory
+    val category: TaskCategory,
+    val recurrence: sktech.schedulify.scheduler.RecurrencePattern
 )
 
 data class ScheduleBlockEntity(

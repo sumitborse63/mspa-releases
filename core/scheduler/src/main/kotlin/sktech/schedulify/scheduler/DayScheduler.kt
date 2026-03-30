@@ -1,4 +1,4 @@
-package com.mspa.scheduler
+package sktech.schedulify.scheduler
 
 import java.time.LocalDateTime
 

@@ -1,4 +1,4 @@
-package com.mspa.scheduler
+package sktech.schedulify.scheduler
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

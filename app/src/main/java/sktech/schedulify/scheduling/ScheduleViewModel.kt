@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import sktech.schedulify.data.InMemoryTaskRepository
 import sktech.schedulify.domain.parsePrompt
-import com.mspa.scheduler.DayScheduler
-import com.mspa.scheduler.ScheduleTask
+import sktech.schedulify.scheduler.DayScheduler
+import sktech.schedulify.scheduler.ScheduleTask
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.UUID
@@ -55,5 +55,5 @@ class ScheduleViewModel : ViewModel() {
 
 data class ScheduleUiState(
     val tasksCount: Int = 0,
-    val blocks: List<com.mspa.scheduler.ScheduledBlock> = emptyList()
+    val blocks: List<sktech.schedulify.scheduler.ScheduledBlock> = emptyList()
 )

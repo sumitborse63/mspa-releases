@@ -18,7 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import sktech.schedulify.scheduling.ScheduleViewModel
-import com.mspa.scheduler.ScheduledBlock
+import sktech.schedulify.scheduler.ScheduledBlock
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -31,7 +31,7 @@ fun SchedulifyApp(viewModel: ScheduleViewModel = remember { ScheduleViewModel() 
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("AI Schedule Generator", style = MaterialTheme.typography.headlineSmall)
+        Text("Schedulify", style = MaterialTheme.typography.headlineSmall)
 
         OutlinedTextField(
             value = viewModel.prompt,

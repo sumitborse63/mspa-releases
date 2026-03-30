@@ -1,13 +1,13 @@
 package sktech.schedulify.data
 
-import sktech.schedulify.domain.TaskDraft
+import sktech.schedulify.domain.ParsedTaskIntent
 
 class InMemoryTaskRepository {
-    private val tasks = mutableListOf<TaskDraft>()
+    private val tasks = mutableListOf<ParsedTaskIntent>()
 
-    fun add(task: TaskDraft) {
+    fun add(task: ParsedTaskIntent) {
         tasks.add(task)
     }
 
-    fun all(): List<TaskDraft> = tasks.toList()
+    fun all(): List<ParsedTaskIntent> = tasks.toList()
 }

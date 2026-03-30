@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Schedulify</string>
+    <string name="tagline">AI-first schedule generator for study, work, personal, and fitness tasks</string>
 </resources>

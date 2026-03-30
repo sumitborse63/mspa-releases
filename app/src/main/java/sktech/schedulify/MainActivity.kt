@@ -3,7 +3,7 @@ package sktech.schedulify
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import sktech.schedulify.ui.MspaApp
+import sktech.schedulify.ui.SchedulifyApp
 import sktech.schedulify.ui.theme.SchedulifyTheme
 
 class MainActivity : ComponentActivity() {
@@ -11,7 +11,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SchedulifyTheme {
-                MspaApp()
+                SchedulifyApp()
             }
         }
     }

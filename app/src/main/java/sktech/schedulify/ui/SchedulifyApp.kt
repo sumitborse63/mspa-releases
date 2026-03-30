@@ -22,7 +22,7 @@ import com.mspa.scheduler.ScheduledBlock
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun MspaApp(viewModel: ScheduleViewModel = remember { ScheduleViewModel() }) {
+fun SchedulifyApp(viewModel: ScheduleViewModel = remember { ScheduleViewModel() }) {
     val state = viewModel.state
 
     Column(
